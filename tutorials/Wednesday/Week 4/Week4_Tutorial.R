@@ -36,7 +36,7 @@ lapply(c("readr", "ggplot2", "dplyr", "viridis", "foreign"),  pkgTest)
 getwd()
 
 # Set working directory
-setwd("/Users/elkarag/Desktop/Teaching/Applied Stats I/Week 4")
+#setwd("/Users/elkarag/Desktop/Teaching/Applied Stats I/Week 4")
 
 # Agenda
 # (0.0) Data-wrangling 
@@ -155,7 +155,7 @@ prop.table(table(df_s$genre,
                  df_s$critics_rating))
 
 # - manual check for 'comedy' genre: which values do we use? 
-# [Answer here]
+63/444
 
 # Interpretation:
 # Estimated probability of two specific values co-occurring.
@@ -172,7 +172,7 @@ prop.table(table(df_s$genre,           # rows
            margin = 1) # over rows
 
 # - manual check for 'comedy' AND 'rotten': which values do we use? 
-# [Answer here]
+63/87
 
 # Add marginal distributions (conditional on rows)
 addmargins(prop.table(table(df_s$genre, 
@@ -200,13 +200,13 @@ round(0.72413793, 2)
 # prop.table(x, margin = 2): proportions across columns (conditional on column)
 
 # What do we use here then? 
-# Over [answer] --> Genre conditional on [answer]
+# Over columns --> Genre conditional on critics rating
 addmargins(prop.table(table(df_s$genre,           #row
                             df_s$critics_rating), # column
                       margin = 2)) 
                       
 # - manual check for 'comedy' given 'rotten' : which values do we use?                       
-# [Answer here] 
+63/190
 
 # ==========================================================
 # Visualizing conditional distributions with a bar plot
@@ -234,8 +234,8 @@ dev.off()
 
 # Test whether genre and critics rating are independent.
 # State the hypotheses: 
-# H0 (null): 
-# H1 (alt):  
+# H0 (null): Genre and critics rating are statistically independent. 
+# H1 (alt):  Genre and critics rating are not statistically independent. 
 
 # Run Chi-square test
 chi <- chisq.test(df_s$genre, df_s$critics_rating)
@@ -264,43 +264,42 @@ chi$residuals
 # Question: Is there an association between education and income?
 
 # Load dataset
-df <- read.csv("fictional_data.csv")
+df <- read.csv("data/fictional_data.csv")
 
 # Quick scatter plot
-plot(df$income,df$edu)
-plot(df$income,df$edu,
+plot(df$edu, df$income)
+plot(df$edu,df$income,
      col=df$cap+1) # Color over third variable (+1, because first color in R is white)
 
 # Let's improve this visualization: 
 # Add a third variable (cap: 0 = non-capital, 1 = capital city)
 # Color: black (0) vs red (1)
-plot(df$income, df$edu,
+plot(df$edu, df$income,
      col = df$cap + 1,     # +1 because color 1 = black, 2 = red
-     xlab="Monthly net income (in Euro)",
-     ylab="University level education (in years)",
+     xlab="University level education (in years)",
+     ylab="Monthly net income (in Euro)",
      main="The relationship between education and income")
 
 # Save a nicer plot
 png(file = "scatter_plot.png")
-plot(df$income, df$edu,
+plot(df$edu, df$income,
      col = df$cap + 1,
-     xlab = "Monthly net income (in Euro)",
-     ylab = "University level education (in years)",
-     main = "The Relationship between Education and Income")
-legend(1000, 8,
+     xlab = "University level education (in years)",
+     ylab = "Monthly net income (in Euro)",
+     main = "The relationship between education and income")
+
+legend("topleft",              
        legend = c("Non-capital", "Capital"),
        col = c("black", "red"),
-       pch = 1)           # marker type
-dev.off()
+       pch = 1)
 
-# Calculate correlation coefficient (Pearson)
-cor(df$income, df$edu)
-
-# -> r ranges from -1 to +1: negative, none, or positive linear association
-
-# Add correlation value to scatterplot
-plot(df$income, df$edu)
-text(1200, 7, sprintf("Correlation = %.4f", cor(df$income, df$edu)))
+# Show Pearson correlation in the plot
+r <- cor(df$income, df$edu)
+plot(df$edu, df$income)
+text(x = max(df$edu, na.rm = TRUE) * 0.1,   
+     y = max(df$income, na.rm = TRUE) * 0.9,
+     labels = sprintf("Correlation = %.4f", r),
+     adj = 0)
 
 
 # -------------------------------#
@@ -315,3 +314,14 @@ summary(lm(df$income ~ df$edu))
 #  - Intercept (b0): expected income when education = 0
 #  - Slope (b1): average change in income per additional year of education
 #  - R-squared: proportion of income variance explained by education
+
+# And a plot 
+# Scatterplot
+plot(df$edu, df$income,
+     xlab = "University level education (years)",
+     ylab = "Monthly net income (Euro)",
+     main = "Relationship between university education and income")
+
+# Fit and add regression line
+fit <- lm(income ~ edu, data = df)
+abline(fit, col = "red", lwd = 2)
