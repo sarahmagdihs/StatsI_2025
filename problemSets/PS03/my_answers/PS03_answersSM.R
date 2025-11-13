@@ -37,6 +37,8 @@ pkgTest <- function(pkg){
 lapply(c("ggplot2", "stargazer"),  pkgTest)
 library(ggplot2)
 library(stargazer)
+if(!require(car)) install.packages("car")
+library(car)
 # set wd for current folder
 setwd(dirname(rstudioapi::getActiveDocumentContext()$path))
 
@@ -75,7 +77,7 @@ ggplot(data=inc.sub, aes(x = difflog, y = voteshare)) +
   labs(title = "Difference in Campaign Spending and Incumbents' Vote Share",
        x = "Difference in Campaign Spending", y = "Incumbent's Vote Share") +
   theme_bw()
-
+ggsave("plot1.pdf")
 # Task 3: Residuals 
 residuals1 <- reg1$residuals
 
@@ -98,10 +100,10 @@ summary(reg2)
 ggplot(data=inc.sub, aes(x = difflog, y = presvote)) +
   geom_point(size=2, shape = 21) +
   geom_smooth(method=lm, color="maroon") + 
-  labs(title = "Difference in Campaign Spending and Presidential Vote Share",
-       x = "Difference in Campaign Spending", y = "Presidential Vote Share") +
+  labs(title = "Difference in Campaign Spending and Vote Share of  Presidential Candidate",
+       x = "Difference in Campaign Spending", y = "Vote Share of  Presidential Candidate (of the incumbent’s party)") +
   theme_bw()
-
+ggsave("plot2.pdf")
 #Task 3: Residuals 
 residuals2 <- reg2$residuals
 
@@ -122,10 +124,13 @@ summary(reg3)
 ggplot(data=inc.sub, aes(x = presvote, y = voteshare)) +
   geom_point(size=2, shape = 21) +
   geom_smooth(method=lm, color="maroon") + 
-  labs(title = "Presidential Candidate's Vote Share and Party's Vote Share (Incumbent Party/Candidate)",
-       x = "Presidential Vote Share", y = "Incumbent Party's Vote Share") +
-  theme_bw()
-
+  labs(title = "Incumbent Party: Vote Share of the Presidential Candidate and Success of Incumbent", 
+       x = "Presidential Candidate's Vote Share", y = "Incumbent's Vote Share") +
+  theme_bw() +
+theme(
+  plot.title = element_text(size = 12) 
+)
+ggsave("plot3.pdf")
 #Task 3: Prediction Equation
 reg3
 #incumbent’s electoral success =  0.4413 + 0.3880*vote share of the presidential candidate of the incumbent’s party
@@ -147,11 +152,11 @@ summary(reg4)
 ggplot(data =df, aes(x = residuals_2, y = residuals_1)) +
   geom_point(size=2, shape = 21) +
   geom_smooth(method=lm, color="maroon") + 
-  labs(title = "Residuals Regression",
-       x = "Residuals from presvote ~ difflog", 
-       y = "Residuals from voteshare ~ difflog") +
+  labs(title = "Residuals Regression: voteshare and presvote (Controlling for difflog)",
+       x = "Residuals of presvote ~ difflog", 
+       y = "Residuals of voteshare ~ difflog") +
   theme_bw()
-
+ggsave("plot4.pdf")
 #Task 3: prediction equation
 reg4
 #residuals from Q1 = 1.942e-18 + 0.2569*residuals from Q2
@@ -167,6 +172,12 @@ reg4
 reg5 <- lm(voteshare ~ difflog + presvote, data = inc.sub)
 summary(reg5)
 
+
+#added residuals plot 
+pdf("Added_Variable_Plots_Q5.pdf", width = 12, height = 7)
+avPlots(reg5, col = "black",col.lines = "maroon", pch = 21, main = "Added Variable Plots for Question 5")
+dev.off()
+
 #Task 2: Prediction equation 
 #Incumbents vote share = 0.4486442 + 0.0355431*difference in spending + 0.2568770*presvote
 
@@ -178,6 +189,9 @@ summary(reg5)
 #slope of presvote in Q5 and the slope in Q4. Because both ask the same question ("How much does the president’s popularity affect the incumbent’s votes once we account for spending?").
 #they just do it using different approaches. 
 
-
-
+stargazer(reg1)
+stargazer(reg2)
+stargazer(reg3)
+stargazer(reg4)
+stargazer(reg5)
 
